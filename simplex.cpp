@@ -47,8 +47,12 @@ int continue_simplex(const vector<T> &c) {
 
 template <typename T>
 vector<T> simplex(vector<vector<T>> A, vector<T> b, vector<T> c) {
-        display(A);
         for(int i = 0; i < A.size(); ++i) for(int j = 0; j < A[0].size(); ++j) A[i][j] = -A[i][j];
+
+        vector<int> hbase(A[0].size());
+        vector<int> base(A.size());
+        for(int i = 0; i < A[0].size(); ++i)    hbase[i]  = i;
+        for(int i = 0; i < A.size(); ++i) base[i] = A[0].size()+i;
 
         T nu = 0;
         int index = continue_simplex(c);
@@ -67,22 +71,27 @@ vector<T> simplex(vector<vector<T>> A, vector<T> b, vector<T> c) {
                         cout <<"NON BORNE"<<endl;
                         break;
                 }
-                pivot(A,b,c,nu,index,eq);
+                pivot(A,b,c,nu,index,eq);//index is the entering variable and eqs the outgoing one
+                swap(hbase[index], base[eq]);
                 index = continue_simplex(c);
         }
-        display(b);
+
+        vector<T> optimal(A[0].size());
+        for(int i = 0; i < A.size(); ++i) if(base[i] < A[0].size()) optimal[base[i]] = b[i];
+
+        display(optimal);
         cout << "nu = " << nu << endl;
 
-        return b;
+        return optimal;
 }
 
-int main() {/*
+int main() {
         vector<vector<double>> A{{-1,-1},{-1,-2},{3,5}};
         vector<double> c{1,1};
-        vector<double> b{-5,-3,20};*/
-        vector<vector<double>> A{{15,20,25, 59, 57, 78},{35,60,60,35,60,60},{20,30,25,35,60,60},{0,250,0, 0,250,0}};
+        vector<double> b{-5,-3,20};
+        /*vector<vector<double>> A{{15,20,25, 59, 57, 78},{35,60,60,35,60,60},{20,30,25,35,60,60},{0,250,0, 0,250,0}};
         vector<double> c{300,250,450, 300, 250, 450};
-        vector<double> b{1200,3000,1500,500};
+        vector<double> b{1200,3000,1500,500};*/
         simplex<double>(A,b,c);
         return 0;
 }
